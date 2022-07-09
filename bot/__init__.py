@@ -49,6 +49,17 @@ try:
 except:
     pass
 
+# download CloudMailruDL script
+try:
+    res = rget("https://raw.githubusercontent.com/HuzunluArtemis/CloudMailruDL/main/CloudMailruDL.py")
+    if res.status_code == 200:
+        with open('CloudMailruDL.py', 'wb+') as f:
+            f.write(res.content)
+    else:
+        log_error(f"Failed to download CloudMailruDL.py {res.status_code}")
+except:
+    pass
+
 try:
     HEROKU_API_KEY = getConfig('HEROKU_API_KEY')
     HEROKU_APP_NAME = getConfig('HEROKU_APP_NAME')

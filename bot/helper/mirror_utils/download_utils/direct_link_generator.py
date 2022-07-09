@@ -8,6 +8,7 @@ from https://github.com/AvinashReddy3108/PaperplaneExtended . I hereby take no c
 than the modifications. See https://github.com/AvinashReddy3108/PaperplaneExtended/commits/master/userbot/modules/direct_links.py
 for original authorship. """
 
+import json
 from requests import get as rget, head as rhead, post as rpost, Session as rsession
 from re import findall as re_findall, sub as re_sub, match as re_match, search as re_search
 from base64 import b64decode
@@ -22,6 +23,7 @@ from bot import LOGGER, UPTOBOX_TOKEN, CRYPT, APPDRIVE_EMAIL, APPDRIVE_PASS
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.ext_utils.bot_utils import is_gdtot_link, is_appdrive_link
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
+from os import popen
 
 fmed_list = ['fembed.net', 'fembed.com', 'femax20.com', 'fcdn.stream', 'feurl.com', 'layarkacaxxi.icu',
              'naniplay.nanime.in', 'naniplay.nanime.biz', 'naniplay.com', 'mm9842.com']
@@ -37,6 +39,8 @@ def direct_link_generator(link: str):
         return yandex_disk(link)
     elif 'mediafire.com' in link:
         return mediafire(link)
+    elif 'cloud.mail.ru' in link:
+        return cm_ru(link)
     elif 'uptobox.com' in link:
         return uptobox(link)
     elif 'osdn.net' in link:
@@ -387,6 +391,7 @@ account = {
    'email': APPDRIVE_EMAIL,
     'passwd': APPDRIVE_PASS
     }
+
 def account_login(client, url, email, password):
     """ AppDrive google drive link generator
     By https://github.com/xcscxr """
@@ -465,3 +470,21 @@ def appdrive(url: str) -> str:
         return info_parsed
     else:
         raise DirectDownloadLinkException(f"{info_parsed['error_message']}")
+
+def cm_ru(url: str) -> str:
+    """ cloud.mail.ru direct links generator
+    Using https://github.com/JrMasterModelBuilder/cmrudl.py """
+    reply = ''
+    try:
+        link = re_findall(r'\bhttps?://.*cloud\.mail\.ru\S+', url)[0]
+    except IndexError:
+        raise DirectDownloadLinkException("`No cloud.mail.ru links found`\n")
+    command = f'CloudMailruDL.py -s {link}'
+    result = popen(command).read()
+    result = result.splitlines()[-1]
+    try:
+        data = json.loads(result)
+    except json.decoder.JSONDecodeError:
+        raise DirectDownloadLinkException("`Error: Can't extract the link`\n")
+    dl_url = data['download']
+    return dl_url
