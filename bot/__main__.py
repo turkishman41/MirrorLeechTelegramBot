@@ -149,7 +149,7 @@ def stats(update, context):
 def start(update, context):
     if CustomFilters.authorized_user(update) or CustomFilters.authorized_chat(update):
         start_string = f'Type /{BotCommands.HelpCommand} to get a list of available commands'
-        sendMarkup(start_string, context.bot, update.message)
+        sendMessage(start_string, context.bot, update.message)
 
 def restart(update, context):
     cmd = update.effective_message.text.split(' ', 1)
