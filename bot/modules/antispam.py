@@ -99,6 +99,7 @@ def CombotAntiSpamCheck(userid):
         return None
 
 def UsergeAntiSpamCheck(userid):
+    return None # closed temporarily because api not responding.
     if not USERGE_ANTISPAM_API: return None
     userid = str(userid)
     api = f"https://api.userge.tk/ban?api_key={USERGE_ANTISPAM_API}&user_id={userid}"
