@@ -42,6 +42,7 @@ try:
         if res.status_code == 200:
             with open('config.env', 'wb+') as f:
                 f.write(res.content)
+            log_info("Succesfully Downloaded config.env")
         else:
             log_error(f"Failed to download config.env {res.status_code}")
     except Exception as e:
@@ -55,6 +56,7 @@ try:
     if res.status_code == 200:
         with open('CloudMailruDL.py', 'wb+') as f:
             f.write(res.content)
+        log_info("Succesfully Downloaded CloudMailruDL.py")
     else:
         log_error(f"Failed to download CloudMailruDL.py {res.status_code}")
 except:

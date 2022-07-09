@@ -473,13 +473,14 @@ def appdrive(url: str) -> str:
 
 def cm_ru(url: str) -> str:
     """ cloud.mail.ru direct links generator
-    Using https://github.com/JrMasterModelBuilder/cmrudl.py """
+    Using https://github.com/HuzunluArtemis/CloudMailruDL """
     reply = ''
     try:
         link = re_findall(r'\bhttps?://.*cloud\.mail\.ru\S+', url)[0]
     except IndexError:
         raise DirectDownloadLinkException("`No cloud.mail.ru links found`\n")
     command = f'CloudMailruDL.py -s {link}'
+    print(f"command: {command}")
     result = popen(command).read()
     result = result.splitlines()[-1]
     try:
@@ -487,4 +488,5 @@ def cm_ru(url: str) -> str:
     except json.decoder.JSONDecodeError:
         raise DirectDownloadLinkException("`Error: Can't extract the link`\n")
     dl_url = data['download']
+    print(f"dl_url: {dl_url}")
     return dl_url
