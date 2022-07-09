@@ -69,6 +69,7 @@ try:
         if res.status_code == 200:
             with open('.netrc', 'wb+') as f:
                 f.write(res.content)
+            log_info("Succesfully Downloaded config from url")
         else:
             log_error(f"Failed to download .netrc {res.status_code}")
     except Exception as e:

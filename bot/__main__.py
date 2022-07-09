@@ -9,7 +9,7 @@ import requests
 from telegram import InlineKeyboardMarkup
 from telegram.ext import CommandHandler
 
-from bot import HEROKU_API_KEY, HEROKU_APP_NAME, bot, dispatcher, updater, botStartTime, IGNORE_PENDING_REQUESTS, LOGGER, Interval, INCOMPLETE_TASK_NOTIFIER, DB_URI, alive, app, main_loop
+from bot import HEROKU_API_KEY, HEROKU_APP_NAME, OWNER_ID, bot, dispatcher, updater, botStartTime, IGNORE_PENDING_REQUESTS, LOGGER, Interval, INCOMPLETE_TASK_NOTIFIER, DB_URI, alive, app, main_loop
 from .helper.ext_utils.fs_utils import start_cleanup, clean_all, exit_clean_up
 from .helper.ext_utils.telegraph_helper import telegraph
 from .helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time
@@ -292,7 +292,7 @@ help_string = f'''
 
 /{BotCommands.RmSudoCommand}: Remove sudo users (Only Owner)
 
-/{BotCommands.RestartCommand}: Restart and update the bot
+/{BotCommands.RestartCommand}: Restart and update the bot. kill dyno: /restart k do dyno restart: /restart d
 
 /{BotCommands.LogCommand}: Get a log file of the bot. Handy for getting crash reports
 '''
@@ -343,6 +343,9 @@ def main():
             chat_id, msg_id = map(int, f)
         bot.edit_message_text("Restarted successfully!", chat_id, msg_id)
         osremove(".restartmsg")
+    else:
+        try: bot.sendMessage(OWNER_ID, 'Bot Started.', 'HTML')
+        except: pass
 
     start_handler = CommandHandler(BotCommands.StartCommand, start, run_async=True)
     ping_handler = CommandHandler(BotCommands.PingCommand, ping,
