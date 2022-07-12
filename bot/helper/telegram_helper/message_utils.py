@@ -57,7 +57,6 @@ def sendPhoto(text: str, bot, message, photo, reply_markup=None):
         return sendPhoto(text, bot, message, photo, reply_markup)
     except Exception as e:
         LOGGER.error(str(e))
-        return
 
 def sendRss(text: str, bot):
     if rss_session is None:

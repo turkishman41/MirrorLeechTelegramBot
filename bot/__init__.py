@@ -31,9 +31,7 @@ LOGGER = getLogger(__name__)
 
 def getConfig(name: str):
     return environ[name]
-
 CONFIG_FILE_URL = environ.get('CONFIG_FILE_URL')
-
 try:
     if len(CONFIG_FILE_URL) == 0:
         raise TypeError
@@ -355,6 +353,13 @@ try:
     ZIP_UNZIP_LIMIT = float(ZIP_UNZIP_LIMIT)
 except:
     ZIP_UNZIP_LIMIT = None
+try:
+    LEECH_LIMIT = getConfig('LEECH_LIMIT')
+    if len(LEECH_LIMIT) == 0:
+        raise KeyError
+    LEECH_LIMIT = float(LEECH_LIMIT)
+except:
+    LEECH_LIMIT = None
 try:
     RSS_CHAT_ID = getConfig('RSS_CHAT_ID')
     if len(RSS_CHAT_ID) == 0:

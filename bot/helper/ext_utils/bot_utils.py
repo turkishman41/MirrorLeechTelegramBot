@@ -25,7 +25,6 @@ URL_REGEX = r"(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+"
 COUNT = 0
 PAGE_NO = 1
 
-
 class MirrorStatus:
     STATUS_UPLOADING = "Uploading 📤"
     STATUS_DOWNLOADING = "Downloading 📥"
@@ -38,21 +37,21 @@ class MirrorStatus:
     STATUS_SPLITTING = "Splitting ✂️"
     STATUS_CHECKING = "CheckingUp 📝"
     STATUS_SEEDING = "Seeding 🌧"
-    
+
 class EngineStatus:
     STATUS_ARIA = "Aria2c v1.35.0"
     STATUS_GD = "Google Api v2.51.0"
     STATUS_MEGA = "MegaSDK v3.12.0"
-    STATUS_QB = "qBittorrent v4.3.9"
+    STATUS_QB = "qBittorrent v4.4.2"
     STATUS_TG = "Pyrogram v2.0.27"
     STATUS_YT = "YT-dlp v22.5.18"
-    STATUS_EXT = "Extract | pExtract"
+    STATUS_EXT = "pExtract"
     STATUS_SPLIT = "FFmpeg v2.9.1"
     STATUS_ZIP = "p7zip v16.02"
 
 PROGRESS_MAX_SIZE = 100 // 9
 PROGRESS_INCOMPLETE = ['◔', '◔', '◑', '◑', '◑', '◕', '◕']
-    
+
 SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 
 
@@ -359,7 +358,7 @@ Bot Uptime: {currentTime}
 T-DN: {recv} | T-UP: {sent}
 CPU: {cpu}% | RAM: {mem}%
 Disk: {total} | Free: {free}
-Used: [{disk}%] is {used}
+Used: {used} [{disk}%]
 """
     return stats
 dispatcher.add_handler(

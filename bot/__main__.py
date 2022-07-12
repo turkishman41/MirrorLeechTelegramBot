@@ -1,109 +1,27 @@
-import random
 from signal import signal, SIGINT
 from os import path as ospath, remove as osremove, execl as osexecl
 from subprocess import run as srun, check_output
 from psutil import disk_usage, cpu_percent, swap_memory, cpu_count, virtual_memory, net_io_counters, boot_time
 from time import time
 from sys import executable
-import requests
 from telegram import InlineKeyboardMarkup
 from telegram.ext import CommandHandler
-
-from bot import HEROKU_API_KEY, HEROKU_APP_NAME, OWNER_ID, bot, dispatcher, updater, botStartTime, IGNORE_PENDING_REQUESTS, LOGGER, Interval, INCOMPLETE_TASK_NOTIFIER, DB_URI, alive, app, main_loop
+from bot import OWNER_ID, bot, dispatcher, updater, botStartTime, IGNORE_PENDING_REQUESTS, LOGGER, Interval, INCOMPLETE_TASK_NOTIFIER, DB_URI, alive, app, main_loop, HEROKU_API_KEY, HEROKU_APP_NAME
 from .helper.ext_utils.fs_utils import start_cleanup, clean_all, exit_clean_up
 from .helper.ext_utils.telegraph_helper import telegraph
 from .helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time
 from .helper.ext_utils.db_handler import DbManger
+from .helper.ext_utils.heroku_helper import getHerokuDetails
 from .helper.telegram_helper.bot_commands import BotCommands
 from .helper.telegram_helper.message_utils import sendMessage, sendMarkup, editMessage, sendLogFile
 from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.button_build import ButtonMaker
-
-from .modules import authorize, list, cancel_mirror, mirror_status, mirror, clone, watch, shell, eval, delete, count, leech_settings, search, rss, antispam
+from .modules import authorize, list, cancel_mirror, mirror_status, mirror, clone, watch, shell, eval, delete, count, leech_settings, search, rss, qbselect, antispam
 import heroku3
-
-def getRandomUserAgent():
-    agents = [
-    "Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.699.0 Safari/534.24",
-    "Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.220 Safari/535.1",
-    "Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.41 Safari/535.1",
-    "Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11",
-    "Mozilla/5.0 (X11; CrOS i686 0.13.507) AppleWebKit/534.35 (KHTML, like Gecko) Chrome/13.0.763.0 Safari/534.35",
-    "Mozilla/5.0 (X11; CrOS i686 0.13.587) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.14 Safari/535.1",
-    "Mozilla/5.0 (X11; CrOS i686 1193.158.0) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.75 Safari/535.7",
-    "Mozilla/5.0 (X11; CrOS i686 12.0.742.91) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.93 Safari/534.30",
-    "Mozilla/5.0 (X11; CrOS i686 12.433.109) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.93 Safari/534.30",
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.34 Safari/534.24",
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/534.24 (KHTML, like Gecko) Ubuntu/10.04 Chromium/11.0.696.0 Chrome/11.0.696.0 Safari/534.24",
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/534.24 (KHTML, like Gecko) Ubuntu/10.10 Chromium/12.0.703.0 Chrome/12.0.703.0 Safari/534.24",
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.21 (KHTML, like Gecko) Chrome/19.0.1042.0 Safari/535.21",
-    "Opera/9.80 (Windows NT 5.1; U; sk) Presto/2.5.22 Version/10.50",
-    "Opera/9.80 (Windows NT 5.1; U; zh-sg) Presto/2.9.181 Version/12.00",
-    "Opera/9.80 (Windows NT 5.1; U; zh-tw) Presto/2.8.131 Version/11.10",
-    "Opera/9.80 (Windows NT 5.1; U;) Presto/2.7.62 Version/11.01",
-    "Opera/9.80 (Windows NT 5.2; U; en) Presto/2.6.30 Version/10.63",
-    "Opera/9.80 (Windows NT 5.2; U; ru) Presto/2.5.22 Version/10.51",
-    "Opera/9.80 (Windows NT 5.2; U; ru) Presto/2.6.30 Version/10.61",
-    "Opera/9.80 (Windows NT 5.2; U; ru) Presto/2.7.62 Version/11.01",
-    "Opera/9.80 (X11; Linux x86_64; U; pl) Presto/2.7.62 Version/11.00",
-    "Opera/9.80 (X11; Linux x86_64; U; Ubuntu/10.10 (maverick); pl) Presto/2.7.62 Version/11.01",
-    "Opera/9.80 (X11; U; Linux i686; en-US; rv:1.9.2.3) Presto/2.2.15 Version/10.10",
-    "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.117 Mobile Safari/537.36"
-    ]
-    return agents[random.randint(0, len(agents)-1)]
-
-def getHerokuDetails(h_api_key, h_app_name):
-    if (not h_api_key) or (not h_app_name): return None
-    try:
-        heroku_api = "https://api.heroku.com"
-        Heroku = heroku3.from_key(h_api_key)
-        app = Heroku.app(h_app_name)
-        useragent = getRandomUserAgent()
-        user_id = Heroku.account().id
-        headers = {
-            "User-Agent": useragent,
-            "Authorization": f"Bearer {h_api_key}",
-            "Accept": "application/vnd.heroku+json; version=3.account-quotas",
-        }
-        path = "/accounts/" + user_id + "/actions/get-quota"
-        session = requests.Session()
-        result = (session.get(heroku_api + path, headers=headers)).json()
-        abc = ""
-        account_quota = result["account_quota"]
-        quota_used = result["quota_used"]
-        quota_remain = account_quota - quota_used
-        #abc += f"Full: {get_readable_time(account_quota)} | "
-        abc += f"<b>Dyno Used:</b> {get_readable_time(quota_used)} | "
-        abc += f"<b>Free:</b> {get_readable_time(quota_remain)}\n"
-        # App Quota
-        AppQuotaUsed = 0
-        OtherAppsUsage = 0
-        for apps in result["apps"]:
-            if str(apps.get("app_uuid")) == str(app.id):
-                try:
-                    AppQuotaUsed = apps.get("quota_used")
-                except Exception as t:
-                    LOGGER.error("error when adding main dyno")
-                    LOGGER.error(t)
-                    pass
-            else:
-                try:
-                    OtherAppsUsage += int(apps.get("quota_used"))
-                except Exception as t:
-                    LOGGER.error("error when adding other dyno")
-                    LOGGER.error(t)
-                    pass
-        LOGGER.info(f"This App: {str(app.name)}")
-        abc += f"<b>This App:</b> {get_readable_time(AppQuotaUsed)}"
-        abc += f" | <b>Other:</b> {get_readable_time(OtherAppsUsage)}"
-        return abc
-    except Exception as g:
-        LOGGER.error(g)
-        return None
 
 def stats(update, context):
     if ospath.exists('.git'):
-        last_commit = check_output(["git log -1 --date=short --pretty=format:'%cd \n<b>From</b> %cr'"], shell=True).decode()
+        last_commit = check_output(["git log -1 --date=short --pretty=format:'%cr <b>On</b> %cd'"], shell=True).decode()
     else:
         last_commit = 'No UPSTREAM_REPO'
     currentTime = get_readable_time(time() - botStartTime)
@@ -144,7 +62,6 @@ def stats(update, context):
     heroku = getHerokuDetails(HEROKU_API_KEY, HEROKU_APP_NAME)
     if heroku: stats += heroku
     sendMessage(stats, context.bot, update.message)
-
 
 def start(update, context):
     if CustomFilters.authorized_user(update) or CustomFilters.authorized_chat(update):
@@ -194,17 +111,14 @@ def restart(update, context):
             f.write(f"{restart_message.chat.id}\n{restart_message.message_id}\n")
         osexecl(executable, executable, "-m", "bot")
 
-
 def ping(update, context):
     start_time = int(round(time() * 1000))
     reply = sendMessage("Starting Ping", context.bot, update.message)
     end_time = int(round(time() * 1000))
     editMessage(f'{end_time - start_time} ms', reply)
 
-
 def log(update, context):
     sendLogFile(context.bot, update.message)
-
 
 help_string_telegraph = f'''<br>
 <b>/{BotCommands.HelpCommand}</b>: To get this message
@@ -215,7 +129,7 @@ help_string_telegraph = f'''<br>
 <br><br>
 <b>/{BotCommands.UnzipMirrorCommand}</b> [download_url][magnet_link]: Start mirroring and upload the file/folder extracted from any archive extension
 <br><br>
-<b>/{BotCommands.QbMirrorCommand}</b> [magnet_link][torrent_file][torrent_file_url]: Start Mirroring using qBittorrent, Use <b>/{BotCommands.QbMirrorCommand} s</b> to select files before downloading and use <b>/{BotCommands.QbMirrorCommand} d</b> to seed specific torrent
+<b>/{BotCommands.QbMirrorCommand}</b> [magnet_link][torrent_file][torrent_file_url]: Start Mirroring using qBittorrent, Use `<b>/{BotCommands.QbMirrorCommand} s</b>` to select files before downloading and use `<b>/{BotCommands.QbMirrorCommand} d</b>` to seed specific torrent and those two args works with all qb commands
 <br><br>
 <b>/{BotCommands.QbZipMirrorCommand}</b> [magnet_link][torrent_file][torrent_file_url]: Start mirroring using qBittorrent and upload the file/folder compressed with zip extension
 <br><br>
@@ -250,6 +164,8 @@ help_string_telegraph = f'''<br>
 <b>/{BotCommands.LeechSetCommand}</b>: Leech settings
 <br><br>
 <b>/{BotCommands.SetThumbCommand}</b>: Reply photo to set it as Thumbnail
+<br><br>
+<b>/{BotCommands.QbSelectCommand}</b>: Reply to an active /qbcmd which was used to start the qb-download or add gid along with cmd. This command mainly for selection incase you decided to select files from already added qb-torrent. But you can always use /qbcmd with arg `s` to select files before download start
 <br><br>
 <b>/{BotCommands.RssListCommand}</b>: List all subscribed rss feed info
 <br><br>
