@@ -257,6 +257,13 @@ try:
         raise KeyError
 except:
     DB_URI = None
+try:
+    RSS_CHAT_ID = getConfig('RSS_CHAT_ID')
+    if len(RSS_CHAT_ID) == 0:
+        raise KeyError
+    RSS_CHAT_ID = int(RSS_CHAT_ID)
+except:
+    RSS_CHAT_ID = None
 tgBotMaxFileSize = 2097151000
 try:
     TG_SPLIT_SIZE = getConfig('TG_SPLIT_SIZE')
@@ -270,10 +277,16 @@ try:
     if len(USER_SESSION_STRING) == 0:
         raise KeyError
     rss_session = Client(name='rss_session', api_id=int(TELEGRAM_API), api_hash=TELEGRAM_HASH, session_string=USER_SESSION_STRING, parse_mode=enums.ParseMode.HTML, no_updates=True)
-    if rss_session:
+    if not rss_session:
+        LOGGER.error("Cannot initialized User Session. Please regenerate USER_SESSION_STRING")
+    else:
         rss_session.start()
-        if (rss_session.get_me()).is_premium: TG_SPLIT_SIZE = 4194304000
-        LOGGER.info("Premium user detected. Upload limit is 4GB now.")
+        if (rss_session.get_me()).is_premium:
+            TG_SPLIT_SIZE = 4194304000
+            LOGGER.info("Premium user detected. Upload limit is 4GB now.")
+        elif (not DB_URI) or (not RSS_CHAT_ID):
+            rss_session.stop()
+            LOGGER.info(f"Not using rss. if you want to use fill RSS_CHAT_ID and DB_URI variables.")
 except:
     USER_SESSION_STRING = None
     rss_session = None
@@ -366,13 +379,6 @@ try:
     LEECH_LIMIT = float(LEECH_LIMIT)
 except:
     LEECH_LIMIT = None
-try:
-    RSS_CHAT_ID = getConfig('RSS_CHAT_ID')
-    if len(RSS_CHAT_ID) == 0:
-        raise KeyError
-    RSS_CHAT_ID = int(RSS_CHAT_ID)
-except:
-    RSS_CHAT_ID = None
 try:
     RSS_DELAY = getConfig('RSS_DELAY')
     if len(RSS_DELAY) == 0:
