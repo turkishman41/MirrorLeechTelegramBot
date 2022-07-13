@@ -91,6 +91,8 @@ def restart(update, context):
     elif dynoKill:
         LOGGER.info("Killing Dyno. MUHAHAHA")
         sendMessage("Killed Dyno.", context.bot, update.message)
+        alive.kill()
+        clean_all()
         heroku_conn = heroku3.from_key(HEROKU_API_KEY)
         app = heroku_conn.app(HEROKU_APP_NAME)
         proclist = app.process_formation()
