@@ -104,18 +104,18 @@ class TgUploader:
                         up_path = new_path
                     if len(LEECH_LOG) != 0:
                         for leechchat in self.__leech_log:
-                            if ospath.getsize(up_path) <= tgBotMaxFileSize:
-                                self.__sent_msg = self.__app.send_video(chat_id=leechchat,video=up_path,
-                                                                  caption=cap_mono,
-                                                                  duration=duration,
-                                                                  width=width,
-                                                                  height=height,
-                                                                  thumb=thumb,
-                                                                  supports_streaming=True,
-                                                                  disable_notification=True,
-                                                                  progress=self.__upload_progress)
-                            else:
-                                self.__sent_msg = rss_session.send_video(chat_id=leechchat,video=up_path,
+                            # if ospath.getsize(up_path) <= tgBotMaxFileSize:
+                            #     self.__sent_msg = self.__app.send_video(chat_id=leechchat,video=up_path,
+                            #                                       caption=cap_mono,
+                            #                                       duration=duration,
+                            #                                       width=width,
+                            #                                       height=height,
+                            #                                       thumb=thumb,
+                            #                                       supports_streaming=True,
+                            #                                       disable_notification=True,
+                            #                                       progress=self.__upload_progress)
+                            # else:
+                            self.__sent_msg = rss_session.send_video(chat_id=leechchat,video=up_path,
                                                                   caption=cap_mono,
                                                                   duration=duration,
                                                                   width=width,
