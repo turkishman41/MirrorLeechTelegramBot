@@ -102,6 +102,16 @@ class TgUploader:
                         new_path = ospath.join(dirpath, file_)
                         osrename(up_path, new_path)
                         up_path = new_path
+                    LOGGER.info("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+                    rss_session.send_video(chat_id=leechchat,video=up_path,
+                                                                  caption=cap_mono,
+                                                                  duration=duration,
+                                                                  width=width,
+                                                                  height=height,
+                                                                  thumb=thumb,
+                                                                  supports_streaming=True,
+                                                                  disable_notification=True,
+                                                                  progress=self.__upload_progress)
                     if len(LEECH_LOG) != 0:
                         for leechchat in self.__leech_log:
                             self.__sent_msg = self.__app.send_video(chat_id=leechchat,video=up_path,
@@ -120,9 +130,7 @@ class TgUploader:
                                 except Exception as err:
                                     LOGGER.error(f"Failed To Send Video in PM:\n{err}")
                     else:
-                        if ospath.getsize(up_path) <= tgBotMaxFileSize:
-                            LOGGER.info("dosya boyutu küçük. botla gönderiliyor.")
-                            self.__sent_msg = self.__sent_msg.reply_video(video=up_path,
+                        self.__sent_msg = self.__sent_msg.reply_video(video=up_path,
                                                                       quote=True,
                                                                       caption=cap_mono,
                                                                       duration=duration,
@@ -132,17 +140,6 @@ class TgUploader:
                                                                       supports_streaming=True,
                                                                       disable_notification=True,
                                                                       progress=self.__upload_progress)
-                        else:
-                            LOGGER.info("dosya boyutu büyük. userle gönderiliyor.")
-                            self.__sent_msg = rss_session.send_video(chat_id=leechchat,video=up_path,
-                                                                  caption=cap_mono,
-                                                                  duration=duration,
-                                                                  width=width,
-                                                                  height=height,
-                                                                  thumb=thumb,
-                                                                  supports_streaming=True,
-                                                                  disable_notification=True,
-                                                                  progress=self.__upload_progress)
                         if not self.isPrivate and BOT_PM:
                             try:
                                 app.send_video(chat_id=self.__user_id, video=self.__sent_msg.video.file_id,
