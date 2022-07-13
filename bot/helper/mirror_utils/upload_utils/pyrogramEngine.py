@@ -5,7 +5,7 @@ from pyrogram.errors import FloodWait, RPCError
 from PIL import Image
 from threading import RLock
 from bot import DOWNLOAD_DIR, AS_DOCUMENT, AS_DOC_USERS, AS_MEDIA_USERS, CUSTOM_FILENAME, \
-                 EXTENSION_FILTER, app, LEECH_LOG, BOT_PM, tgBotMaxFileSize, rss_session
+                 EXTENSION_FILTER, TG_SPLIT_SIZE, app, LEECH_LOG, BOT_PM, tgBotMaxFileSize, rss_session
 from bot.helper.ext_utils.fs_utils import take_ss, get_media_info, get_path_size
 from bot.helper.ext_utils.bot_utils import get_readable_file_size
 LOGGER = getLogger(__name__)
@@ -102,20 +102,11 @@ class TgUploader:
                         new_path = ospath.join(dirpath, file_)
                         osrename(up_path, new_path)
                         up_path = new_path
-                    LOGGER.info("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-                    
                     if len(LEECH_LOG) != 0:
                         for leechchat in self.__leech_log:
-                            # self.__sent_msg = self.__app.send_video(chat_id=leechchat,video=up_path,
-                            #                                       caption=cap_mono,
-                            #                                       duration=duration,
-                            #                                       width=width,
-                            #                                       height=height,
-                            #                                       thumb=thumb,
-                            #                                       supports_streaming=True,
-                            #                                       disable_notification=True,
-                            #                                       progress=self.__upload_progress)
-                            self.__sent_msg = rss_session.send_video(chat_id=leechchat,video=up_path,
+                            # ok
+                            if ospath.getsize(up_path) > tgBotMaxFileSize:
+                                self.__sent_msg = rss_session.send_video(chat_id=leechchat,video=up_path,
                                                                   caption=cap_mono,
                                                                   duration=duration,
                                                                   width=width,
@@ -124,6 +115,17 @@ class TgUploader:
                                                                   supports_streaming=True,
                                                                   disable_notification=True,
                                                                   progress=self.__upload_progress)
+                            else:
+                                self.__sent_msg = self.__app.send_video(chat_id=leechchat,video=up_path,
+                                                                  caption=cap_mono,
+                                                                  duration=duration,
+                                                                  width=width,
+                                                                  height=height,
+                                                                  thumb=thumb,
+                                                                  supports_streaming=True,
+                                                                  disable_notification=True,
+                                                                  progress=self.__upload_progress)
+                            
                             if BOT_PM:
                                 try:
                                     app.send_video(chat_id=self.__user_id, video=self.__sent_msg.video.file_id,
@@ -131,7 +133,6 @@ class TgUploader:
                                 except Exception as err:
                                     LOGGER.error(f"Failed To Send Video in PM:\n{err}")
                     else:
-                        LOGGER.info("cccccccccccccccccccccccccccccc")
                         self.__sent_msg = self.__sent_msg.reply_video(video=up_path,
                                                                       quote=True,
                                                                       caption=cap_mono,
@@ -143,7 +144,6 @@ class TgUploader:
                                                                       disable_notification=True,
                                                                       progress=self.__upload_progress)
                         if not self.isPrivate and BOT_PM:
-                            LOGGER.info("ddddddddddddddddddddddddddddddddddd")
                             try:
                                 app.send_video(chat_id=self.__user_id, video=self.__sent_msg.video.file_id,
                                                caption=cap_mono)
