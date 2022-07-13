@@ -510,6 +510,7 @@ try:
     BOT_PM = BOT_PM.lower() == 'true'
 except KeyError:
     BOT_PM = False
+LOGGER.info(f"BOT_PM: {str(BOT_PM)}")
 try:
     TOKEN_PICKLE_URL = getConfig('TOKEN_PICKLE_URL')
     if len(TOKEN_PICKLE_URL) == 0:
