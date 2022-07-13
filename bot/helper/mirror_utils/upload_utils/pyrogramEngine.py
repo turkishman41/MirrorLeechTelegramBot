@@ -105,7 +105,6 @@ class TgUploader:
                         up_path = new_path
                     if len(LEECH_LOG) != 0:
                         for leechchat in self.__leech_log:
-                            # ok
                             if ospath.getsize(up_path) > tgBotMaxFileSize: usingclient = rss_session
                             else: usingclient = self.__app
                             self.__sent_msg = usingclient.send_video(chat_id=leechchat,video=up_path,
@@ -223,7 +222,6 @@ class TgUploader:
                         if BOT_PM:
                             try:
                                 app.copy_message(chat_id=self.__user_id, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id)
-                                #app.send_document(chat_id=self.__user_id, document=self.__sent_msg.document.file_id, caption=cap_mono)
                             except Exception as err:
                                 LOGGER.error(f"Failed To Send Document in PM:\n{err}")
                 else:
