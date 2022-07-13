@@ -128,8 +128,8 @@ class TgUploader:
                             
                             if BOT_PM:
                                 try:
-                                    app.send_video(chat_id=self.__user_id, video=self.__sent_msg.video.file_id,
-                                                   caption=cap_mono)
+                                    self.__sent_msg.copy(chat_id=self.__user_id, caption=cap_mono)
+                                    # app.send_video(chat_id=self.__user_id, video=self.__sent_msg.video.file_id, caption=cap_mono)
                                 except Exception as err:
                                     LOGGER.error(f"Failed To Send Video in PM:\n{err}")
                     else:
