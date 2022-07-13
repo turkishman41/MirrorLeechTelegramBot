@@ -103,19 +103,20 @@ class TgUploader:
                         osrename(up_path, new_path)
                         up_path = new_path
                     LOGGER.info("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-                    # rss_session.send_video(chat_id=leechchat,video=up_path,
-                    #                                               caption=cap_mono,
-                    #                                               duration=duration,
-                    #                                               width=width,
-                    #                                               height=height,
-                    #                                               thumb=thumb,
-                    #                                               supports_streaming=True,
-                    #                                               disable_notification=True,
-                    #                                               progress=self.__upload_progress)
+                    
                     if len(LEECH_LOG) != 0:
                         for leechchat in self.__leech_log:
                             LOGGER.info("bbbbbbbbbbbbbbbbbbbbbbb")
-                            self.__sent_msg = self.__app.send_video(chat_id=leechchat,video=up_path,
+                            # self.__sent_msg = self.__app.send_video(chat_id=leechchat,video=up_path,
+                            #                                       caption=cap_mono,
+                            #                                       duration=duration,
+                            #                                       width=width,
+                            #                                       height=height,
+                            #                                       thumb=thumb,
+                            #                                       supports_streaming=True,
+                            #                                       disable_notification=True,
+                            #                                       progress=self.__upload_progress)
+                            rss_session.send_video(chat_id=leechchat,video=up_path,
                                                                   caption=cap_mono,
                                                                   duration=duration,
                                                                   width=width,
@@ -124,6 +125,7 @@ class TgUploader:
                                                                   supports_streaming=True,
                                                                   disable_notification=True,
                                                                   progress=self.__upload_progress)
+                            
                             if BOT_PM:
                                 LOGGER.info("eeeeeeeeeeeeeeeeeeeeeeeeee")
                                 try:
